@@ -1,0 +1,8 @@
+out/
+build/
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+.cache/
