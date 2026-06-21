@@ -1,5 +1,13 @@
 # KoiRTS
 
+## License
+
+This project is currently closed source and proprietary. The intent is to
+revisit licensing later and relicense it under GPLv3 or another
+open-source license when I figure out which one I want to choose. 
+
+Third-party dependencies keep their own licenses.
+
 ## Build
 
 This project generates `main.c` in the build directory from Carp during the
