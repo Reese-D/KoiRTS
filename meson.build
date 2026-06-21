@@ -6,6 +6,7 @@ project('KoiRTS', 'c',
     ])
 
 cmake = import('cmake')
+cc = meson.get_compiler('c')
 
 carp_core_inc = include_directories('vendor/carp-core')
 
@@ -31,6 +32,7 @@ endif
 
 raylib_proj = cmake.subproject('raylib', options: raylib_opts)
 raylib_dep = raylib_proj.dependency('raylib')
+math_dep = cc.find_library('m', required: false)
 
 c_args = []
 if host_machine.system() != 'windows'
@@ -61,6 +63,6 @@ endif
 executable('KoiRTS',
     main_c,
     include_directories: carp_core_inc,
-    dependencies: raylib_dep,
+    dependencies: [raylib_dep, math_dep],
     c_args: c_args,
     install: true)
