@@ -44,6 +44,12 @@ if host_machine.system() != 'windows'
         '-D_XOPEN_SOURCE=500',
         '-D_GNU_SOURCE',
     ]
+else
+    c_args += [
+        '-DWIN32_LEAN_AND_MEAN',
+        '-DNOGDI',
+        '-DNOUSER',
+    ]
 endif
 
 if carp_prog.found()

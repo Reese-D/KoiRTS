@@ -47,6 +47,34 @@ jobs:
       - name: Build
         run: meson compile -C build
 
+  macos:
+    runs-on: macos-latest
+    env:
+      CARP_DIR: ${{ github.workspace }}/subprojects/Carp
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: haskell-actions/setup@v2
+        with:
+          enable-stack: true
+          stack-version: latest
+
+      - name: Install build dependencies
+        run: brew install cmake meson ninja pkg-config
+
+      - name: Build Carp
+        working-directory: subprojects/Carp
+        run: stack build
+
+      - name: Configure
+        run: meson setup build
+
+      - name: Build
+        run: meson compile -C build
+
   windows:
     runs-on: windows-latest
     env:
