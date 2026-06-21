@@ -1,4 +1,41 @@
-(load "core.carp")
+(system-include "stdint.h")
+(system-include "raylib.h")
+
+(register-type RayColor "Color")
+
+(defmodule Raylib
+  (register init-window (Fn [Int Int (Ptr CChar)] ()) "InitWindow")
+  (register set-target-fps (Fn [Int] ()) "SetTargetFPS")
+  (register window-should-close (Fn [] Bool) "WindowShouldClose")
+  (register begin-drawing (Fn [] ()) "BeginDrawing")
+  (register clear-background (Fn [RayColor] ()) "ClearBackground")
+  (register draw-text (Fn [(Ptr CChar) Int Int Int RayColor] ()) "DrawText")
+  (register end-drawing (Fn [] ()) "EndDrawing")
+  (register close-window (Fn [] ()) "CloseWindow")
+
+  (deftemplate make-color (Fn [Byte Byte Byte Byte] RayColor)
+    "Color $NAME(uint8_t r, uint8_t g, uint8_t b, uint8_t a)"
+    "$DECL {
+      return (Color){ r, g, b, a };
+    }"))
 
 (defn main []
-  (println* "KoiRTS"))
+  (let-do [title @"KoiRTS"]
+    (do
+      (Raylib.init-window 1280 720 (String.cstr &title))
+      (Raylib.set-target-fps 60)
+      (while (not (Raylib.window-should-close))
+        (do
+          (Raylib.begin-drawing)
+          (Raylib.clear-background (Raylib.make-color (Byte.from-int 245)
+                                                       (Byte.from-int 245)
+                                                       (Byte.from-int 245)
+                                                       (Byte.from-int 255)))
+          (Raylib.draw-text (String.cstr &title)
+                            20 20 28
+                            (Raylib.make-color (Byte.from-int 25)
+                                               (Byte.from-int 25)
+                                               (Byte.from-int 25)
+                                               (Byte.from-int 255)))
+          (Raylib.end-drawing)))
+      (Raylib.close-window))))
