@@ -47,6 +47,17 @@ jobs:
       - name: Build
         run: meson compile -C build
 
+      - name: Package artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        run: tar -czf KoiRTS-${{ github.ref_name }}-linux.tar.gz -C build KoiRTS
+
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: KoiRTS-${{ github.ref_name }}-linux
+          path: KoiRTS-${{ github.ref_name }}-linux.tar.gz
+
   macos:
     runs-on: macos-latest
     env:
@@ -74,6 +85,17 @@ jobs:
 
       - name: Build
         run: meson compile -C build
+
+      - name: Package artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        run: tar -czf KoiRTS-${{ github.ref_name }}-macos.tar.gz -C build KoiRTS
+
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: KoiRTS-${{ github.ref_name }}-macos
+          path: KoiRTS-${{ github.ref_name }}-macos.tar.gz
 
   windows:
     runs-on: windows-latest
@@ -118,3 +140,15 @@ jobs:
 
       - name: Build
         run: meson compile -C build
+
+      - name: Package artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: powershell
+        run: Compress-Archive -Path build\KoiRTS.exe -DestinationPath KoiRTS-${{ github.ref_name }}-windows.zip
+
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: KoiRTS-${{ github.ref_name }}-windows
+          path: KoiRTS-${{ github.ref_name }}-windows.zip
