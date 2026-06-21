@@ -2,7 +2,9 @@
 
 ## Build
 
-This project builds from the committed C output in `out/main.c`. Make sure `meson`, `cmake`, and `ninja` are on `PATH`.
+This project builds from the committed C output in `out/main.c`. That file is
+tracked in git and must exist for the default CI path to configure and build
+successfully. Make sure `meson`, `cmake`, and `ninja` are on `PATH`.
 
 ```sh
 git submodule update --init --recursive
@@ -28,7 +30,7 @@ meson compile -C build
 To regenerate `out/main.c` from Carp during development, run:
 
 ```sh
-carp --generate-only --eval-preload '(Project.config "output-directory" ".")' -b src/main.carp
+carp --generate-only --eval-preload '(Project.config "output-directory" "out")' -b src/main.carp
 ```
 
 Then rebuild with Meson.
