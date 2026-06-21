@@ -1,5 +1,5 @@
 project('KoiRTS', 'c',
-    version: '0.1.0',
+    version: '0.0.1',
     default_options: [
         'c_std=c99',
         'warning_level=2',
@@ -51,14 +51,15 @@ if get_option('build_from_carp')
             'carp',
             '--generate-only',
             '--eval-preload',
-            '(Project.config "output-directory" ".")',
+            '(Project.config "output-directory" "../out/")',
             '-b',
             '@INPUT@',
         ],
         build_by_default: true)
-else
-    main_c = files('out/main.c')
 endif
+
+main_c = files('out/main.c')
+
 
 executable('KoiRTS',
     main_c,
