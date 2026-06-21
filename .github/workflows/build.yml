@@ -3,40 +3,62 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    runs-on: ${{ matrix.os }}
+  linux:
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Install Meson and Ninja (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y meson ninja-build \
-            libgl1-mesa-dev libx11-dev libxrandr-dev \
-            libxinerama-dev libxcursor-dev libxi-dev
-
-      - name: Install Meson and Ninja (macOS)
-        if: runner.os == 'macOS'
-        run: brew install meson ninja
-
-      - name: Install Meson and Ninja (Windows)
-        if: runner.os == 'Windows'
-        run: pip install meson ninja
-
-      # TODO: add Carp installation step per platform once Carp
-      # packaging is confirmed for each runner environment
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            meson \
+            ninja-build \
+            pkg-config \
+            libgl1-mesa-dev \
+            libopenal-dev \
+            libx11-dev \
+            libxext-dev \
+            libxfixes-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxinerama-dev \
+            libxrandr-dev
 
       - name: Configure
         run: meson setup build
 
       - name: Build
+        run: meson compile -C build
+
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-meson
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-toolchain
+
+      - name: Configure
+        shell: msys2 {0}
+        run: meson setup build
+
+      - name: Build
+        shell: msys2 {0}
         run: meson compile -C build
