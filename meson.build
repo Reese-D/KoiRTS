@@ -36,13 +36,24 @@ endif
 raylib_proj = cmake.subproject('raylib', options: raylib_opts)
 raylib_dep = raylib_proj.dependency('raylib')
 math_dep = cc.find_library('m', required: false)
+appleframeworks_dep = []
+if host_machine.system() == 'darwin'
+    appleframeworks_dep += dependency(
+        'appleframeworks',
+        modules: ['Cocoa', 'IOKit', 'CoreFoundation'],
+    )
+endif
 
 c_args = []
-if host_machine.system() != 'windows'
+if host_machine.system() == 'linux'
     c_args += [
         '-D_POSIX_C_SOURCE=199309L',
         '-D_XOPEN_SOURCE=500',
         '-D_GNU_SOURCE',
+    ]
+elif host_machine.system() == 'darwin'
+    c_args += [
+        '-D_DARWIN_C_SOURCE',
     ]
 else
     c_args += [
@@ -88,6 +99,6 @@ main_c = custom_target('main_c_from_carp',
 executable('KoiRTS',
     main_c,
     include_directories: carp_core_inc,
-    dependencies: [raylib_dep, math_dep],
+    dependencies: [raylib_dep, math_dep] + appleframeworks_dep,
     c_args: c_args,
     install: true)
