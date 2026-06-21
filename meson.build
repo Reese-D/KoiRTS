@@ -7,8 +7,11 @@ project('KoiRTS', 'c',
 
 cmake = import('cmake')
 cc = meson.get_compiler('c')
+carp_prog = find_program('carp', required: false)
+stack_prog = find_program('stack', required: carp_prog.found() == false)
 
 carp_core_inc = include_directories('vendor/carp-core')
+carp_stack_yaml = join_paths(meson.project_source_root(), 'subprojects', 'Carp', 'stack.yaml')
 
 raylib_opts = cmake.subproject_options()
 raylib_opts.add_cmake_defines({
@@ -43,22 +46,37 @@ if host_machine.system() != 'windows'
     ]
 endif
 
-if get_option('build_from_carp')
-    main_c = custom_target('main_c_from_carp',
-        input: 'src/main.carp',
-        output: 'main.c',
-        command: [
-            'carp',
-            '--generate-only',
-            '--eval-preload',
-            '(Project.config "output-directory" "../out/")',
-            '-b',
-            '@INPUT@',
-        ],
-        build_by_default: true)
+if carp_prog.found()
+    message('Using system carp to generate build/main.c')
+    carp_cmd = [
+        carp_prog,
+        '--generate-only',
+        '--eval-preload',
+        '(Project.config "output-directory" ".")',
+        '-b',
+    ]
+else
+    message('Using vendored Carp via stack to generate build/main.c')
+    carp_cmd = [
+        stack_prog,
+        '--stack-yaml',
+        carp_stack_yaml,
+        'exec',
+        'carp',
+        '--',
+        '--generate-only',
+        '--eval-preload',
+        '(Project.config "output-directory" ".")',
+        '-b',
+    ]
 endif
 
-main_c = files('out/main.c')
+main_c = custom_target('main_c_from_carp',
+    input: 'src/main.carp',
+    output: 'main.c',
+    command: carp_cmd + ['@INPUT@'],
+    build_always_stale: true,
+    build_by_default: true)
 
 
 executable('KoiRTS',

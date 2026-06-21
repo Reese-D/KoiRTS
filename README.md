@@ -2,15 +2,21 @@
 
 ## Build
 
-This project builds from the committed C output in `out/main.c`. That file is
-tracked in git and must exist for the default CI path to configure and build
-successfully. Make sure `meson`, `cmake`, and `ninja` are on `PATH`.
+This project generates `main.c` in the build directory from Carp during the
+build. If `carp` is already installed, Meson will use it directly. Otherwise
+it falls back to the vendored Carp submodule via `stack`. Make sure `meson`,
+`cmake`, and `ninja` are on `PATH`, and set `CARP_DIR` to the Carp submodule
+root:
 
 ```sh
 git submodule update --init --recursive
+export CARP_DIR="$PWD/subprojects/Carp"
 meson setup build
 meson compile -C build
 ```
+
+If you do not have a system `carp`, also install `stack` so Meson can build
+the vendored compiler.
 
 If you need to rebuild from scratch:
 
@@ -19,21 +25,6 @@ rm -rf build
 meson setup build
 meson compile -C build
 ```
-
-To build from Carp through Meson instead of the committed C output, configure with:
-
-```sh
-meson setup build -Dbuild_from_carp=true
-meson compile -C build
-```
-
-To regenerate `out/main.c` from Carp during development, run:
-
-```sh
-carp --generate-only --eval-preload '(Project.config "output-directory" "out")' -b src/main.carp
-```
-
-Then rebuild with Meson.
 
 To refresh the vendored Carp runtime headers after updating the Carp submodule:
 
@@ -50,8 +41,7 @@ source:
 ./scripts/update-carp-core.sh /path/to/carp
 ```
 
-After regenerating the headers, rebuild from the committed C output with Meson,
-or regenerate `out/main.c` from Carp first if your change needs it.
+After regenerating the headers, rebuild with Meson.
 
 ## Run
 

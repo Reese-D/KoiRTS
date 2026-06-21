@@ -1,6 +1,0 @@
-option(
-    'build_from_carp',
-    type: 'boolean',
-    value: false,
-    description: 'Generate main.c from Carp during the build instead of using out/main.c',
-)
