@@ -1,3 +1,6 @@
 [submodule "subprojects/raylib"]
 	path = subprojects/raylib
 	url = git@github.com:raysan5/raylib.git
+[submodule "subprojects/Carp"]
+	path = subprojects/Carp
+	url = git@github.com:carp-lang/Carp.git

@@ -33,6 +33,24 @@ carp --generate-only --eval-preload '(Project.config "output-directory" ".")' -b
 
 Then rebuild with Meson.
 
+To refresh the vendored Carp runtime headers after updating the Carp submodule:
+
+```sh
+git submodule update --init --recursive
+./scripts/update-carp-core.sh
+```
+
+The helper copies from `subprojects/Carp/core` by default. You can also pass an
+explicit Carp checkout or core directory if you want to refresh from another
+source:
+
+```sh
+./scripts/update-carp-core.sh /path/to/carp
+```
+
+After regenerating the headers, rebuild from the committed C output with Meson,
+or regenerate `out/main.c` from Carp first if your change needs it.
+
 ## Run
 
 ```sh
