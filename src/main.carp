@@ -1,5 +1,6 @@
 (system-include "stdint.h")
 (system-include "raylib.h")
+(system-include "flecs_smoke.h")
 
 (register-type RayColor "Color")
 
@@ -19,9 +20,13 @@
       return (Color){ r, g, b, a };
     }"))
 
+(defmodule Flecs
+  (register smoke (Fn [] Bool) "koi_flecs_smoke"))
+
 (defn main []
   (let-do [title @"KoiRTS"]
     (do
+      (assert (Flecs.smoke))
       (Raylib.init-window 1280 720 (String.cstr &title))
       (Raylib.set-target-fps 60)
       (while (not (Raylib.window-should-close))

@@ -11,6 +11,8 @@ carp_prog = find_program('carp', required: false)
 stack_prog = find_program('stack', required: carp_prog.found() == false)
 
 carp_core_inc = include_directories('vendor/carp-core')
+include_inc = include_directories('include')
+vendor_inc = include_directories('vendor')
 carp_stack_yaml = join_paths(meson.project_source_root(), 'subprojects', 'Carp', 'stack.yaml')
 
 raylib_opts = cmake.subproject_options()
@@ -36,6 +38,13 @@ endif
 raylib_proj = cmake.subproject('raylib', options: raylib_opts)
 raylib_dep = raylib_proj.dependency('raylib')
 math_dep = cc.find_library('m', required: false)
+flecs_platform_deps = []
+if host_machine.system() == 'linux'
+    flecs_platform_deps += [
+        cc.find_library('rt', required: true),
+        dependency('threads'),
+    ]
+endif
 appleframeworks_dep = []
 if host_machine.system() == 'darwin'
     appleframeworks_dep += dependency(
@@ -97,8 +106,9 @@ main_c = custom_target('main_c_from_carp',
 
 
 executable('KoiRTS',
-    main_c,
-    include_directories: carp_core_inc,
-    dependencies: [raylib_dep, math_dep] + appleframeworks_dep,
+    [main_c, files('csrc/flecs_smoke.c'), files('vendor/flecs/flecs.c')],
+    include_directories: [carp_core_inc, include_inc, vendor_inc],
+    dependencies: [raylib_dep, math_dep] + flecs_platform_deps + appleframeworks_dep,
     c_args: c_args,
+    override_options: host_machine.system() == 'windows' ? [] : ['c_std=gnu99'],
     install: true)
